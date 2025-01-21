@@ -1,0 +1,262 @@
+simulation_time:
+  rate: 3600
+  simulation_start_date: 1969-07-12T12:00+00:00
+  simulation_end_date: 1969-07-21T12:00+00:00
+
+interaction_asset:
+  name: cpo_1
+  type: cpo
+
+network:
+  name: main_network
+  children:
+    - network:
+        name: house_1
+        type: network
+        children:
+          - network:
+              name: solar_panels
+              type: network
+              children:
+                - asset:
+                    name: solar_panel_1
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_2
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_3
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_4
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+          - asset:
+              name: public_charging_station_1
+              type: chargingstation
+              max_power_kw: 11
+              factor: 1
+              args:
+                smart: true
+    - network:
+        name: house_2
+        type: network
+        children:
+          - network:
+              name: solar_panels
+              type: network
+              children:
+                - asset:
+                    name: solar_panel_5
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_6
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_7
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_8
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+          - asset:
+              name: public_charging_station_2
+              type: chargingstation
+              max_power_kw: 11
+              factor: 1
+              args:
+                smart: true
+    - network:
+        name: house_3
+        type: network
+        children:
+          - network:
+              name: solar_panels
+              type: network
+              children:
+                - asset:
+                    name: solar_panel_9
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_10
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_11
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_12
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+          - asset:
+              name: public_charging_station_3
+              type: chargingstation
+              max_power_kw: 11
+              factor: 1
+              args:
+                smart: true
+    - network:
+        name: house_4
+        type: network
+        children:
+          - network:
+              name: solar_panels
+              type: network
+              children:
+                - asset:
+                    name: solar_panel_13
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_14
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_15
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+                - asset:
+                    name: solar_panel_16
+                    type: solarpanel
+                    max_power_kw: 0.3
+                    factor: 3.6
+          - asset:
+              name: public_charging_station_4
+              type: chargingstation
+              max_power_kw: 11
+              factor: 1
+              args:
+                smart: true
+    - network:
+        name: Wind_farm
+        type: network
+        children:
+          - asset:
+              name: Wind_turbine_1
+              type: windturbine
+              max_power_kw: 2000
+              factor: 0.01
+          - asset:
+              name: Wind_turbine_2
+              type: windturbine
+              max_power_kw: 2000
+              factor: 0.01
+    - network:
+        name: Solar_farm
+        type: network
+        children:
+          - asset:
+              name: solar_panel_17
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_18
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_19
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_20
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_21
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_22
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_23
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+          - asset:
+              name: solar_panel_24
+              type: solarpanel
+              max_power_kw: 0.3
+              factor: 3.6
+    - network:
+        name: Charging_hub
+        type: network
+        children:
+          - asset:
+              name: public_charging_station_5
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1
+          - asset:
+              name: public_charging_station_6
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1
+          - asset:
+              name: public_charging_station_7
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1
+          - asset:
+              name: public_charging_station_8
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1
+          - asset:
+              name: public_charging_station_9
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1
+          - asset:
+              name: public_charging_station_10
+              type: chargingstation
+              max_power_kw: 22
+              factor: 1
+              args:
+                smart: true
+                cpo: cpo_1

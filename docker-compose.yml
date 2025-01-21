@@ -1,0 +1,39 @@
+services:
+  simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simulation
+    restart: on-failure
+    depends_on:
+      - xmpp-prosody
+    ports:
+      - "${OCPP_PORT:-9000}:${OCPP_PORT:-9000}"
+    networks:
+      - sim_network
+    volumes:
+      - ./src/data:/app/src/data:rw
+    # environment:
+    #   - OCPP_URL=${OCPP_URL:-0.0.0.0}
+    #   - OCPP_PORT=${OCPP_PORT:-9000}
+
+  xmpp-prosody:
+    build:
+      context: ./prosody
+      dockerfile: Dockerfile
+    image: unclev/prosody-docker-extended:latest
+    container_name: xmpp-prosody
+    restart: on-failure
+    ports:
+      - 80:8080
+      - 5222:5222
+      - 5269:5269
+      - 5347:5347
+      - 5280:5280
+      - 5281:5281
+    networks:
+      - sim_network
+
+networks:
+  sim_network:
+    name: sim_network

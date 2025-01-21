@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Simulator"
+authors = [
+    { name = "Yvan de Wert" }
+]
+description = "Simulator for simulating energy systems"
+requires-python = ">=3.10"
+version = "0.0.1"
+
+
+[tool.pylint]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "line-too-long",
+    "import-error",
+    "too-few-public-methods",
+    "consider-using-generator",
+    "too-many-arguments",
+    "pointless-string-statement",
+    "duplicate-code",
+    "protected-access"
+]
+
+[tool.mypy]
+strict = true
+show_error_codes = true
+ignore_missing_imports = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_unreachable = true
+disallow_untyped_decorators = false
+
+[tool.isort]
+profile = "black"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+exclude_also = ["if __name__ == .__main__.:"]
+omit = ["tests/*"]
