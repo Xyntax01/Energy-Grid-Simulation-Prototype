@@ -34,7 +34,7 @@ class CpoAgent(BaseInteractionAgent):
         )
         self.charging_stations = []
         self.charging_stations_charge_speed = []
-        self.charging_stations_new_charge_speed =[]
+        self.charging_stations_new_charge_speed = []
         self.congestion = 0.0
         self.behaviour = CpoBehaviour()
         self.receive_cs_info_behaviour = CpoReceiveCSInfoBehaviour()
@@ -77,15 +77,33 @@ class CpoAgent(BaseInteractionAgent):
         if not self.charging_stations_charge_speed:
             return  # No charging stations
 
-        total_demand = sum(cs_data["value"] for cs in self.charging_stations_charge_speed for cs_data in cs.values())
-        current_power = [list(cs.values())[0]["value"] for cs in self.charging_stations_charge_speed]
+        total_demand = sum(
+            cs_data["value"]
+            for cs in self.charging_stations_charge_speed
+            for cs_data in cs.values()
+        )
+        current_power = [
+            list(cs.values())[0]["value"] for cs in self.charging_stations_charge_speed
+        ]
         if self.congestion > 0:
             self.print(f"Overconsumption: {self.congestion}")
-            new_power = self.distribute_power_reduction(total_demand, self.congestion, current_power, reduction_factor=1)
+            new_power = self.distribute_power_reduction(
+                total_demand, self.congestion, current_power, reduction_factor=1
+            )
         elif self.congestion < 0:
             self.print(f"Oversupply: {self.congestion}")
-            num_charging_stations_charging = sum(1 for cs in self.charging_stations_charge_speed for cs_data in cs.values() if cs_data["is_charging"])
-            new_power = self.distribute_power_increase(self.congestion, current_power, num_charging_stations_charging, increase_factor=1)
+            num_charging_stations_charging = sum(
+                1
+                for cs in self.charging_stations_charge_speed
+                for cs_data in cs.values()
+                if cs_data["is_charging"]
+            )
+            new_power = self.distribute_power_increase(
+                self.congestion,
+                current_power,
+                num_charging_stations_charging,
+                increase_factor=1,
+            )
 
         for i, cs in enumerate(self.charging_stations_charge_speed):
             found = False
@@ -98,28 +116,39 @@ class CpoAgent(BaseInteractionAgent):
             if not found:
                 self.charging_stations_new_charge_speed.append({cs_id: new_power[i]})
 
-    def distribute_power_reduction(self, total_demand, congestion, current_power, reduction_factor=1.0):
+    def distribute_power_reduction(
+        self, total_demand, congestion, current_power, reduction_factor=1.0
+    ):
         """Distributes power reduction proportionally."""
         if congestion <= 0 and total_demand <= 0:
             return current_power
 
         total_reduction = congestion * reduction_factor
-        reduction_proportion = total_reduction / total_demand if total_demand != 0 else 0
-        new_power = [max(0, power * (1 - reduction_proportion)) for power in current_power]
+        reduction_proportion = (
+            total_reduction / total_demand if total_demand != 0 else 0
+        )
+        new_power = [
+            max(0, power * (1 - reduction_proportion)) for power in current_power
+        ]
         return new_power
 
-    def distribute_power_increase(self, congestion, current_power, num_charging_stations, increase_factor=1.0):
+    def distribute_power_increase(
+        self, congestion, current_power, num_charging_stations, increase_factor=1.0
+    ):
         """Distributes power increase proportionally."""
 
         # self.print(f"Congestion CPO data: {congestion} | {abs(congestion)} | {current_power} | {num_charging_stations}")
         if num_charging_stations > 0:
-            increase_proportion = abs(congestion) / num_charging_stations * increase_factor
+            increase_proportion = (
+                abs(congestion) / num_charging_stations * increase_factor
+            )
             self.print(f"Increase proportion: {increase_proportion}")
             new_power = [power + increase_proportion for power in current_power]
             # self.print(f"New power: {new_power}")
         else:
             new_power = current_power
         return new_power
+
 
 class CpoBehaviour(CyclicBehaviour):  # type: ignore
     def __init__(self) -> None:
@@ -135,6 +164,7 @@ class CpoBehaviour(CyclicBehaviour):  # type: ignore
         await self.agent.smart_charging_css()
         await asyncio.sleep(1)
         # self.agent.print("CPOBehaviour running")
+
 
 class CpoReceiveCSInfoBehaviour(CyclicBehaviour):  # type: ignore
     def __init__(self) -> None:
@@ -156,19 +186,29 @@ class CpoReceiveCSInfoBehaviour(CyclicBehaviour):  # type: ignore
             elif "power_usage" in msg_body:
                 # self.agent.print(msg_body["power_usage"])
                 power_usage = msg_body["power_usage"]
-                self.add_power_usage(power_usage["CS"], power_usage["unit"], power_usage["value"], power_usage["is_charging"])
+                self.add_power_usage(
+                    power_usage["CS"],
+                    power_usage["unit"],
+                    power_usage["value"],
+                    power_usage["is_charging"],
+                )
 
-    def add_power_usage(self, cs_id: str, unit: str, value: str, is_charging: bool) -> None:
+    def add_power_usage(
+        self, cs_id: str, unit: str, value: str, is_charging: bool
+    ) -> None:
         found = False
         for cs in self.agent.charging_stations_charge_speed:
             if cs_id in cs:
-                cs[cs_id] = {"unit": unit, "value": value , "is_charging": is_charging}
+                cs[cs_id] = {"unit": unit, "value": value, "is_charging": is_charging}
                 found = True
                 break
         if not found:
-            self.agent.charging_stations_charge_speed.append({cs_id: {"unit": unit, "value": value, "is_charging": is_charging}})
+            self.agent.charging_stations_charge_speed.append(
+                {cs_id: {"unit": unit, "value": value, "is_charging": is_charging}}
+            )
 
-class CpoSendCsNewChargingSpeed(CyclicBehaviour): # type: ignore
+
+class CpoSendCsNewChargingSpeed(CyclicBehaviour):  # type: ignore
     def __init__(self) -> None:
         """
         Initialize the behaviour.

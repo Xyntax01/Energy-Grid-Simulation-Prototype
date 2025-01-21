@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from typing import Any, List, Optional
 
-import pandas as pd
 from aioxmpp import JID
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message

@@ -36,6 +36,7 @@ def get_main_network_agent_jid(domain: str) -> str:
     """
     return f"main_network@{domain}"
 
+
 def get_cpo_agent_jid(domain: str) -> str:
     """
     Get the NetworkAgent JID.

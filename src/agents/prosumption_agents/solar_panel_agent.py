@@ -131,7 +131,9 @@ class SolarPanelAgent(TimeKeepingMixin, BaseProsumptionAgent):
         deltaT = 3
 
         # Cell temperature calculation
-        cell_temp = ambient_temp + (solar_irradiance / 1000) * (a + b * wind_speed) + deltaT
+        cell_temp = (
+            ambient_temp + (solar_irradiance / 1000) * (a + b * wind_speed) + deltaT
+        )
 
         return cell_temp
 

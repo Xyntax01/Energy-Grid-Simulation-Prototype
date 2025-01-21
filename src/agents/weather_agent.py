@@ -209,13 +209,15 @@ class WeatherBehaviour(PeriodicBehaviour):  # type: ignore
         """
         Determine if weather data should be updated based on the current time.
         """
-        self.agent.print(f"Current time: {self.agent.sim_timestamp} | Next time: {self.agent.next_datetime}")
+        self.agent.print(
+            f"Current time: {self.agent.sim_timestamp} | Next time: {self.agent.next_datetime}"
+        )
         return self.agent.next_datetime is None or datetime.strptime(
             self.agent.sim_timestamp.strftime("%H:30:00"), "%H:%M:%S"
         ) >= datetime.strptime(
             self.agent.next_datetime.strftime("%H:%M:%S"), "%H:%M:%S"
         )
-    
+
     def _read_weather_data(self) -> pd.DataFrame:
         """
         Read the weather data from the dataset.
@@ -232,7 +234,9 @@ class WeatherBehaviour(PeriodicBehaviour):  # type: ignore
         self.agent.print(f"Fetching weather data for {self.agent.sim_timestamp}")
         current_datetime = self.agent.sim_timestamp.strftime("0000-%m-%d %H:30:00")
         self.agent.next_datetime = self.agent.sim_timestamp + pd.Timedelta(hours=1)
-        current_data = self.weather_data.loc[self.weather_data["Local []"] == current_datetime]
+        current_data = self.weather_data.loc[
+            self.weather_data["Local []"] == current_datetime
+        ]
         return current_data.iloc[0] if not current_data.empty else pd.Series()
 
     def _update_agent_weather_data(self, weather_data: pd.Series) -> None:

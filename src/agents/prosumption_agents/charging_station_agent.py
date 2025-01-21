@@ -1,19 +1,18 @@
 import asyncio
+import json
 import random
 from typing import Any, Dict, Optional
 
-import json
 from aioxmpp import JID
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
 from spade.message import Message
 
-from src.agents.common_behaviours.subscribeable_behaviour import MailingList, SubscriptionBehaviour
+from src.agents.common_behaviours.subscribeable_behaviour import SubscriptionBehaviour
 from src.agents.common_behaviours.time_keeping_mixin import TimeKeepingMixin
 from src.agents.prosumption_agents.base_prosumption_agent import BaseProsumptionAgent
 from src.enums.component_types import ComponentType
-from src.utils.csv_utils import save_updates_to_csv
 from src.utils.logger import LoggerFactory
-from src.utils.service_jids import get_main_network_agent_jid, get_cpo_agent_jid
+from src.utils.service_jids import get_main_network_agent_jid
 
 
 class ChargingStationAgent(TimeKeepingMixin, BaseProsumptionAgent):
@@ -87,7 +86,7 @@ class ChargingStationAgent(TimeKeepingMixin, BaseProsumptionAgent):
         """
         Get a random stop time with a higher probability for times commonly used in real life.
         """
-        common_charge_duration = [6,7,8]
+        common_charge_duration = [6, 7, 8]
         if random.random() < 0.8:
             return random.choice(common_charge_duration)
         duration = random.randint(1, 23)
@@ -135,16 +134,32 @@ class ChargingStationAgent(TimeKeepingMixin, BaseProsumptionAgent):
         Smart charging.
         """
         if self.congestion > 0.0:  # Overconsumption
-            reduction_amount = self.congestion * self.congestion_reduction_factor  # Calculate reduction amount based on congestion
-            self._net_power_usage_kw = max(0.001, self._net_power_usage_kw - reduction_amount)  # Ensure power usage doesn't go below 0
-            self.print(f"Congestion: Overconsumption, Lowering charging speed to: {self._net_power_usage_kw}")
+            reduction_amount = (
+                self.congestion * self.congestion_reduction_factor
+            )  # Calculate reduction amount based on congestion
+            self._net_power_usage_kw = max(
+                0.001, self._net_power_usage_kw - reduction_amount
+            )  # Ensure power usage doesn't go below 0
+            self.print(
+                f"Congestion: Overconsumption, Lowering charging speed to: {self._net_power_usage_kw}"
+            )
         elif self.congestion < 0.0:  # Oversupply
-            reduction_factor = abs(self.congestion) / 100  # Calculate reduction factor based on congestion
-            self._net_power_usage_kw += (1 - reduction_factor)  # Lower by calculated factor
-            self._net_power_usage_kw = min(self._net_power_usage_kw, self.max_power_usage_kw)
-            self.print(f"Congestion: Oversupply, Increasing charging speed to: {self._net_power_usage_kw}")
+            reduction_factor = (
+                abs(self.congestion) / 100
+            )  # Calculate reduction factor based on congestion
+            self._net_power_usage_kw += (
+                1 - reduction_factor
+            )  # Lower by calculated factor
+            self._net_power_usage_kw = min(
+                self._net_power_usage_kw, self.max_power_usage_kw
+            )
+            self.print(
+                f"Congestion: Oversupply, Increasing charging speed to: {self._net_power_usage_kw}"
+            )
         else:  # No congestion
-            self.print(f"Congestion: None, Maintaining charging speed: {self._net_power_usage_kw}")
+            self.print(
+                f"Congestion: None, Maintaining charging speed: {self._net_power_usage_kw}"
+            )
 
     def _get_power_usage_message(self, message: Message = Message()) -> Message:
         """
@@ -173,9 +188,10 @@ class ChargingStationAgent(TimeKeepingMixin, BaseProsumptionAgent):
         )
         message.set_metadata("type", "cs_power_usage")
         return message
-    
+
     def _process_congestion_message(self, data: Dict[str, Any]) -> None:
         self.congestion = float(data["congestion"]["value"])
+
 
 class ChargingStationBehaviour(CyclicBehaviour):  # type: ignore
     def __init__(self) -> None:
@@ -195,14 +211,17 @@ class ChargingStationBehaviour(CyclicBehaviour):  # type: ignore
             self.agent.is_charging = False
         if self.agent.smart:
             if self.agent.cpo:
-                message = self.agent._get_power_usage_message(message=Message(to=f"{self.agent.cpo}@{self.agent.jid.domain}"))
+                message = self.agent._get_power_usage_message(
+                    message=Message(to=f"{self.agent.cpo}@{self.agent.jid.domain}")
+                )
                 await self.send(message)
             if self.agent.is_charging:
                 if self.agent.cpo is None:
                     self.agent.smart_charging()
 
                 self.agent.save_power_update(
-                    self.agent.get_formatted_sim_timestamp(), self.agent._net_power_usage_kw
+                    self.agent.get_formatted_sim_timestamp(),
+                    self.agent._net_power_usage_kw,
                 )
                 self.agent.print(
                     f"Charging station is charging {self.agent.is_charging} with {self.agent.net_power_usage_kw} kW"
@@ -211,13 +230,15 @@ class ChargingStationBehaviour(CyclicBehaviour):  # type: ignore
             if self.agent.is_charging:
                 self.agent._net_power_usage_kw = self.agent.max_power_usage_kw
                 self.agent.save_power_update(
-                    self.agent.get_formatted_sim_timestamp(), self.agent._net_power_usage_kw
+                    self.agent.get_formatted_sim_timestamp(),
+                    self.agent._net_power_usage_kw,
                 )
                 self.agent.print(
                     f"Charging station is charging {self.agent.is_charging} with {self.agent.net_power_usage_kw} kW"
-                )       
+                )
         self.agent.send_power_update_to_parent()
         await asyncio.sleep(0.1)
+
 
 class ChargingStationSendInfoBehaviour(OneShotBehaviour):  # type: ignore
     def __init__(self) -> None:
@@ -237,7 +258,8 @@ class ChargingStationSendInfoBehaviour(OneShotBehaviour):  # type: ignore
         await self.send(msg)
         # await asyncio.sleep(1)
 
-class ChargingStationCpoNewChargeSpeed(CyclicBehaviour): # type: ignore
+
+class ChargingStationCpoNewChargeSpeed(CyclicBehaviour):  # type: ignore
     def __init__(self) -> None:
         """
         Initialize the behaviour.

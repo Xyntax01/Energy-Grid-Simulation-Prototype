@@ -184,5 +184,4 @@ sim_run.log*
   
 # visual studio code config
 .vscode/
-src/data/*
-data/*
+src/data/power_updates.csv

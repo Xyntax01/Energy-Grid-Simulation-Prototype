@@ -99,7 +99,7 @@ class WindTurbineAgent(TimeKeepingMixin, BaseProsumptionAgent):
         # air_density = self.air_pressure / (287.05 * (self.ambient_temperature + 273.15))
         swept_area = 1.0  # Assumed to be 1 m² for simplicity
         air_density = 288.15
-        power = 0.5 * air_density * swept_area * (self._wind_speed_m_s ** 3)
+        power = 0.5 * air_density * swept_area * (self._wind_speed_m_s**3)
 
         return power * self.factor / 1000  # Return in kW
 
