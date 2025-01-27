@@ -1,6 +1,6 @@
 # Energy Grid Simulation Prototype
 
-[![CI](https://github.com/Xyntax01/Congestion-Smart-Charging-Simulation/actions/workflows/ci.yml/badge.svg)](https://github.com/Xyntax01/Congestion-Smart-Charging-Simulation/actions/workflows/ci.yml)
+[![CI](https://github.com/Xyntax01/Energy-Grid-Simulation-Prototype/actions/workflows/ci.yml/badge.svg)](https://github.com/Xyntax01/Energy-Grid-Simulation-Prototype/actions/workflows/ci.yml)
 
 This prototype simulates the Dutch energy grid, it includes agents such as:
 
