@@ -1,6 +1,6 @@
 # Energy Grid Simulation Prototype
 
-![nox workflow](https://github.com/Xyntax01/Energy-Grid-Simulation-Prototype/blob/main/.github/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/Xyntax01/Congestion-Smart-Charging-Simulation/actions/workflows/ci.yml/badge.svg)](https://github.com/Xyntax01/Congestion-Smart-Charging-Simulation/actions/workflows/ci.yml)
 
 This prototype simulates the Dutch energy grid, it includes agents such as:
 
@@ -60,7 +60,9 @@ To see the code coverage in more detail, open the `htmlcov\index.html` file.
 A network with assets can be configured using a yaml configuration file. This file configures a root network and defines all the other assets and (sub)networks as it's children. Documentation and an example configuration file can be found [here](./docs/configuration.md).
 
 ## Configuration
+
 This simulation requires Python 3.9 or higher. Make sure to install dependencies using:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -73,8 +75,24 @@ To modify Docker environment variables for the container, you can add them to th
 
 ## Adding a new agent
 
-- Create a new class that implements `spade.agent.Agent`.
-- Create a new behaviour class that implements e.g., `CyclicBehaviour` and create an instance called `self.behaviour` in
-  the agent class.
-- In the agent class, create an async function called `setup`.
-- In this function, call `self.add_behaviour(self.behaviour)` with the behaviour class to implement this behaviour.
+1. Create a new class that inherits from either a prosumption or interaction base agent (e.g., BaseProsumptionAgent, BaseInteractionAgent). Implement required methods such as setup(), where you define and add any needed behaviours.
+2. Implement at least one behaviour class (e.g., CyclicBehaviour) and add it to your agent in the setup() method.
+3. If the agent needs data from weather or time agents, subscribe to them by creating appropriate SubscriptionBehaviours and adding them in setup().
+4. In src/factories/agent_factory.py and src/factories/real_agent_factory.py, add references to your class so that your new agent type can be instantiated properly. Update the dictionaries or methods that create and return agent instances to include your new agent.
+5. (Optional) If the agent must be part of the simulation network, add configuration details in config.yaml or the relevant network structure, ensuring the asset name and type match your newly added agent.
+
+## Adding Agent Parameters
+
+When creating a new agent, you can add optional parameters by defining them in your agent’s constructor and using them in your behaviours. For example:
+
+- Provide a “factor” argument to scale power usage or generation.
+- Allow a “smart” boolean to enable or disable advanced logic.
+
+## Subscribing to Time or Weather
+
+To use time or weather data in your agent:
+
+1. Import SubscriptionBehaviour from src/agents/common_behaviours/subscribeable_behaviour.py.
+2. Add a SubscriptionBehaviour to your agent’s setup() method, targeting the TimeAgent or WeatherAgent JID.
+3. Implement a callback function (e.g., \_process_weather_message) to handle the incoming data.
+4. Update your agent’s internal state and calculations (e.g., net_power_usage_kw, temperature adjustments) based on the subscribed info.
